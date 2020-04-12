@@ -19,7 +19,9 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
     GenericButtonListener genericButtonListener = new GenericButtonListener();
     EditText editText;
     TextView textView;
+    int sum = 0;
     ArrayList<Integer> list = new ArrayList<Integer>();
+    String lastCall = "";
     private class GenericButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -36,13 +38,20 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.compute_button:
-                    Intent intent = new Intent(getApplicationContext(), Colocviu1_245SecondaryActivity.class);
-                    intent.putIntegerArrayListExtra(Constants.INT_ARRAY, list);
-                    startActivityForResult(intent, Constants.SECONDARY_REQ);
+                    if (lastCall.equals(textView.getText().toString())) {
+                        Toast.makeText(getApplicationContext(), "Sum is: " + sum, Toast.LENGTH_SHORT).show();
+                    } else {
+                        lastCall = textView.getText().toString();
+
+                        Intent intent = new Intent(getApplicationContext(), Colocviu1_245SecondaryActivity.class);
+                        intent.putIntegerArrayListExtra(Constants.INT_ARRAY, list);
+                        startActivityForResult(intent, Constants.SECONDARY_REQ);
+                    }
                     break;
             }
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +67,12 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
 
         add_button.setOnClickListener(genericButtonListener);
         compute_button.setOnClickListener(genericButtonListener);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(Constants.SUM)) {
+                sum = Integer.parseInt(savedInstanceState.getString(Constants.SUM));
+            }
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -68,9 +83,23 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
                     if (intent != null && intent.getExtras().containsKey(Constants.SUM)) {
                         Toast.makeText(this, "Sum is: " + intent.getExtras().get(Constants.SUM),
                                 Toast.LENGTH_SHORT).show();
+                        sum = Integer.parseInt(intent.getExtras().get(Constants.SUM).toString());
 
                     }
                 }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(Constants.SUM, String.valueOf(sum));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState.containsKey(Constants.SUM)) {
+            sum = Integer.parseInt(savedInstanceState.getString(Constants.SUM));
         }
     }
 }
