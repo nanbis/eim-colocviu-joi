@@ -5,4 +5,6 @@ class Constants {
     public static final String SUM = "SUM";
     public static final int OK = 0;
     public static final int SECONDARY_REQ = 2;
+    public static final String BROADCAST = "Sum is over 10";
+    public static final String BROADCAST_RECEIVER_EXTRA = "Receive Broadcast";
 }

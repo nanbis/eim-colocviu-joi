@@ -2,8 +2,10 @@ package ro.pub.cs.systems.eim.colocviu1_245;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +24,8 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
     int sum = 0;
     ArrayList<Integer> list = new ArrayList<Integer>();
     String lastCall = "";
+    private IntentFilter intentFilter = new IntentFilter();
+
     private class GenericButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -73,6 +77,7 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
                 sum = Integer.parseInt(savedInstanceState.getString(Constants.SUM));
             }
         }
+        intentFilter.addAction(Constants.BROADCAST);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -84,6 +89,11 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "Sum is: " + intent.getExtras().get(Constants.SUM),
                                 Toast.LENGTH_SHORT).show();
                         sum = Integer.parseInt(intent.getExtras().get(Constants.SUM).toString());
+                        if (sum > 10) {
+                            Intent intent1 = new Intent(getApplicationContext(), Colocviu1_245Service.class);
+                            intent1.putExtra(Constants.SUM, sum);
+                            getApplicationContext().startService(intent1);
+                        }
 
                     }
                 }
@@ -101,5 +111,33 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
         if (savedInstanceState.containsKey(Constants.SUM)) {
             sum = Integer.parseInt(savedInstanceState.getString(Constants.SUM));
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, Colocviu1_245Service.class);
+        stopService(intent);
+        super.onDestroy();
+    }
+
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), intent.getExtras().get(Constants.BROADCAST_RECEIVER_EXTRA).toString(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(messageBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
     }
 }
