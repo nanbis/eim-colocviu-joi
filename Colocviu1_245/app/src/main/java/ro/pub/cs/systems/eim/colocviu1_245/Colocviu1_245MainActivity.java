@@ -2,11 +2,15 @@ package ro.pub.cs.systems.eim.colocviu1_245;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,6 +36,9 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.compute_button:
+                    Intent intent = new Intent(getApplicationContext(), Colocviu1_245SecondaryActivity.class);
+                    intent.putIntegerArrayListExtra(Constants.INT_ARRAY, list);
+                    startActivityForResult(intent, Constants.SECONDARY_REQ);
                     break;
             }
         }
@@ -51,5 +58,19 @@ public class Colocviu1_245MainActivity extends AppCompatActivity {
 
         add_button.setOnClickListener(genericButtonListener);
         compute_button.setOnClickListener(genericButtonListener);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        switch (requestCode) {
+            case Constants.SECONDARY_REQ:
+                if (resultCode == Constants.OK) {
+                    if (intent != null && intent.getExtras().containsKey(Constants.SUM)) {
+                        Toast.makeText(this, "Sum is: " + intent.getExtras().get(Constants.SUM),
+                                Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+        }
     }
 }
